@@ -9,11 +9,6 @@
 
 using namespace std;
 
-int genRandNum(int maxLimit)
-{
-  return rand()%maxLimit;
-}
-
 bool find_unasigned_location(char grid[9][9], char &row, char &col)
 {
     for (row = 0; row < 9; row++)
@@ -74,13 +69,18 @@ bool Sudoku::solve_grid(void)
     return false; //this triggers backtracking
 }
 
+/*
+ * Box is a 3x3 region in Sudoku grid
+ * The algorith is we will fill in 3 diagonal box, which don't have any common row or column
+ * --> we don't need to check value in those box is safe or not
+ * Doing this helps solve_grid() reduce steps because we have already filled 1/3 of the grid
+*/ 
 void Sudoku::fill_diagonal_box(char index)
 {
     char start = index * 3;
 
-    // random_shuffle(number_arr.begin(), number_arr.end(), genRandNum);
+    // Shuffle number_arr to randomly create a "Box" -> the grid will be different each time it is created
     unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-
     shuffle (number_arr.begin(), number_arr.end(), std::default_random_engine(seed));
 
     for (auto i = 0; i < 3; i++)
@@ -94,10 +94,15 @@ void Sudoku::fill_diagonal_box(char index)
 
 bool Sudoku::fill_grid(void)
 {
+    // First: fill 3 diagonal box
+    // | x | . | . |
+    // | . | x | . |
+    // | . | . | x |
     fill_diagonal_box(0);
     fill_diagonal_box(1);
     fill_diagonal_box(2);
 
+    // Second: fill all the remaining
     solve_grid();
 
     print_grid();
@@ -111,18 +116,21 @@ bool Sudoku::is_safe(char pos, char value)
     char box_start_row = row - row % 3; //horizontal starting position of 3x3 box
     char box_start_col = col - col % 3; //vertical starting position of 3x3 box
 
+    // check if value is used in the row
     for (char i = 0; i < 9; i++)
     {
         if (value == grid[row][i])
             return false;
     }
 
+    // check if value is used in the column
     for (char i = 0; i < 9; i++)
     {
         if (value == grid[i][col])
             return false;
     }
 
+    // check if value is used in the box
     for (char i = 0; i < 3; i++)
     {
         for (char j = 0; j < 3; j++)
@@ -130,24 +138,10 @@ bool Sudoku::is_safe(char pos, char value)
             if (value == grid[box_start_row+i][box_start_col+j])
             {
                 return false;
-            }
-                
+            }  
         }
     }
 
-    return true;
-}
-
-bool Sudoku::is_grid_filled_full(void)
-{
-    for (auto i = 0; i < 9; i++)
-    {
-        for (auto j = 0; j < 9; j++)
-        {
-            if (grid[i][j] == 0)
-                return false;
-        }
-    }
     return true;
 }
 
