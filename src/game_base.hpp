@@ -10,6 +10,6 @@ class GameBase {
 
         Difficulty difficulty;
 
-        virtual void init(void) = 0;
-        virtual void run(void) = 0;
+        // virtual void init(void) = 0;
+        // virtual void run(void) = 0;
 };
