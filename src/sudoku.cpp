@@ -77,6 +77,10 @@ bool Sudoku::solve_grid(void)
 */ 
 void Sudoku::fill_diagonal_box(char index)
 {
+    //check for valid argument
+    if (index > 3)
+        return;
+
     char start = index * 3;
 
     // Shuffle number_arr to randomly create a "Box" -> the grid will be different each time it is created
@@ -115,6 +119,9 @@ bool Sudoku::is_safe(char pos, char value)
     char row = pos / 9;
     char box_start_row = row - row % 3; //horizontal starting position of 3x3 box
     char box_start_col = col - col % 3; //vertical starting position of 3x3 box
+
+    if ((pos > 81) || (value > 9) || (value < 1))
+        return false;
 
     // check if value is used in the row
     for (char i = 0; i < 9; i++)
